@@ -1,0 +1,76 @@
+#!/usr/bin/env python3
+import cProfile
+import math
+import os
+
+PARTS = [1, 2]
+PATH = os.path.dirname(os.path.realpath(__file__))
+FILES = ['sample.txt', 'input.txt']
+PAUSE = True
+
+def parse(my_input: list[str]) -> list[int]:
+    result: list[str] = [] # TODO - more accurate type, also for return type, above
+    for line in my_input:
+        if not line:
+            continue
+        try:
+            sign = -1 if line[0] == 'L' else 1
+            num = sign * int(line[1:])
+            result.append(num)
+        except BaseException as e:
+            print(line)
+            raise e
+    return result
+
+def solution1(my_input: list[str]) -> int:
+    data = parse(my_input)
+    total = 50
+    zeroes = 0
+    for num in data:
+        total = (total + num) % 100
+        if total == 0:
+            zeroes += 1
+    return zeroes
+
+
+def count_zeroes(x,y):
+    val = x + y
+    z = 0
+    if val < 0:
+        z = math.ceil((-100+val) / 100)
+        z = 1 + z if x == 0 else z
+    else:
+        z = math.floor(val / 100)
+        z = 1 + z if val == 0 else z
+    return abs(z)
+
+def solution2(my_input: list[str]) -> int:
+    data = parse(my_input)
+    total = 50
+    zeroes = 0
+    for num in data:
+        new_total = (total + num)
+        zeroes += count_zeroes(total, num)
+        total = new_total % 100
+    return zeroes
+
+result: int
+def main():
+    for part in PARTS:
+        print(f"---- Part {part} ----")
+        for file in FILES:
+            filename = file.split('.', maxsplit=1)[0]
+            print(f'-- {file} --')
+            with open('/'.join([PATH, file]), 'r', encoding='utf-8') as f:
+                lines = f.read().split('\n')
+                cProfile.run(f'result = solution{part}({lines})', f'{part}-{filename}.pstats')
+                print(result)
+            if PAUSE:
+                text = input('continue? ')
+                if text:
+                    break
+        if PAUSE and text:
+            break
+
+if __name__ == '__main__':
+    main()
