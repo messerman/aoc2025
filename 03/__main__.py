@@ -9,7 +9,7 @@ PAUSE = False
 SOLUTION = 1
 
 def parse(my_input: list[str]) -> list[list[int]]:
-    result: list[list[int]] = [] # TODO - more accurate type, also for return type, above
+    result: list[list[int]] = []
     for line in my_input:
         if not line:
             continue
