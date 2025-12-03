@@ -6,6 +6,7 @@ PARTS = [1, 2]
 PATH = os.path.dirname(os.path.realpath(__file__))
 FILES = ['sample.txt', 'input.txt']
 PAUSE = True
+SOLUTION = 1
 
 def parse(my_input: list[str]) -> list[str]:
     result: list[str] = [] # TODO - more accurate type, also for return type, above
@@ -18,10 +19,14 @@ def parse(my_input: list[str]) -> list[str]:
     return result
 
 def solution1(my_input: list[str]) -> int:
+    global SOLUTION
+    SOLUTION = 1
     data = parse(my_input)
     return -1 # TODO
 
 def solution2(my_input: list[str]) -> int:
+    global SOLUTION
+    SOLUTION = 2
     data = parse(my_input)
     return -1 # TODO
 
