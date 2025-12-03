@@ -5,11 +5,11 @@ import os
 PARTS = [1, 2]
 PATH = os.path.dirname(os.path.realpath(__file__))
 FILES = ['sample.txt', 'input.txt']
-PAUSE = True
+PAUSE = False
 SOLUTION = 1
 
 def parse(my_input: list[str]) -> list[list[int]]:
-    result: list[str] = [] # TODO - more accurate type, also for return type, above
+    result: list[list[int]] = [] # TODO - more accurate type, also for return type, above
     for line in my_input:
         if not line:
             continue
@@ -20,7 +20,7 @@ def parse(my_input: list[str]) -> list[list[int]]:
             raise e
     return result
 
-def find_big(nums: list[int], size: int = 2) -> int:
+def find_big(nums: list[int], size: int = 2) -> list[int]:
     assert size <= len(nums)
     if len(nums) <= 0 or len(nums) == size:
         return nums
@@ -61,6 +61,7 @@ def solution2(my_input: list[str]) -> int:
 
 result: int
 def main():
+    text = None
     for part in PARTS:
         print(f"---- Part {part} ----")
         for file in FILES:
