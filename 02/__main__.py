@@ -31,7 +31,6 @@ def num_digits(val: int) -> int:
     return len(str(val))
 
 def find_invalid(start: str, end: str) -> list[int]:
-    print(SOLUTION)
     slen = len(start)
     elen = len(end)
     offset = elen-slen
@@ -53,7 +52,6 @@ def find_invalid(start: str, end: str) -> list[int]:
 def find_invalid_eq(start: int, end: int) -> list[int]:
     assert(num_digits(start) == num_digits(end))
     digits = num_digits(start)
-    print(start, end, digits)
 
     if SOLUTION == 1 and digits % 2:
         return []
@@ -63,17 +61,15 @@ def find_invalid_eq(start: int, end: int) -> list[int]:
     for i in range(sval, digits // 2 + 1):
         factor = repeat_factor(i, digits)
         if factor < 0:
-            print('    unable to comply')
+            # print('    unable to comply')
+            continue
 
         s = int(str(start)[:i])
         e = int(str(end)[:i])
-        print(s, e)
         for j in range(int(str(start)[:i]), int(str(end)[:i])+1):
             if j*factor in range(start, end+1):
-                print(f'{j} * {factor} = {j*factor}')
                 results.append(j*factor)
 
-    print(results)
     return results
 
 def solution1(my_input: list[str]) -> int:
@@ -83,9 +79,8 @@ def solution1(my_input: list[str]) -> int:
     results: list[int] = []
     for pair in data:
         r = find_invalid(pair[0], pair[1])
-        print(pair, r)
+        # print(pair, r)
         results += r
-        print('-'*10)
 
     return sum(results)
 
@@ -96,9 +91,8 @@ def solution2(my_input: list[str]) -> int:
     results: list[int] = []
     for pair in data:
         r = find_invalid(pair[0], pair[1])
-        print(pair, r)
+        # print(pair, r)
         results += r
-        print('-'*10)
 
     return sum(results)
 
