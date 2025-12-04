@@ -120,3 +120,8 @@ class Grid:
             if len(res) == length:
                 result.append(''.join(res))
         return result
+
+    def neighbors_of(self, cell: GridCell, diagonals = False) -> list[GridCell]:
+        neighbors = cell.neighbors(diagonals)
+        return [self.at(n) for n in neighbors if self.in_bounds(n)]
+

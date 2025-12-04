@@ -41,18 +41,22 @@ def solution2(my_input: list[str]) -> int:
     global SOLUTION
     SOLUTION = 2
     grid = parse(my_input)
-    cells = grid.cells.values()
     total = 0
-    while True:
-        removed = 0
-        for cell in filter(lambda c: c.value == '@', cells):
-            neighbors = cell.neighbors(True)
-            rolls = [c for c in neighbors if grid.in_bounds(c) and grid[c].value == '@']
+    to_remove = [cell for cell in grid.cells.values() if cell.value == '@']
+    neighbors = {cell: grid.neighbors_of(cell, True) for cell in to_remove}
+    while to_remove:
+        removed = False
+        for cell in to_remove:
+            cell_neighbors = neighbors[cell]
+            rolls = [neighbor for neighbor in cell_neighbors if neighbor.value == '@']
             if len(rolls) < 4:
                 removed += 1
                 cell.value = '.'
+
         if not removed:
             break
+
+        to_remove = [cell for cell in to_remove if cell.value == '@']
         total += removed
 
     return total
