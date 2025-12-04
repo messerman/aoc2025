@@ -41,7 +41,21 @@ def solution2(my_input: list[str]) -> int:
     global SOLUTION
     SOLUTION = 2
     grid = parse(my_input)
-    return -1 # TODO
+    total = 0
+    while True:
+        cells: list[GridCell] = []
+        for cell in filter(lambda c: c.value == '@', grid.cells.values()):
+            neighbors = cell.neighbors(True)
+            rolls = [c for c in neighbors if grid.in_bounds(c) and grid[c].value == '@']
+            if len(rolls) < 4:
+                cells.append(cell)
+        if len(cells) == 0:
+            break
+        total += len(cells)
+        for cell in cells:
+            cell.value = '.'
+
+    return total
 
 result: int
 def main():
