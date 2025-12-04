@@ -7,7 +7,7 @@ from tools.grid import Grid, GridCell
 PARTS = [1, 2]
 PATH = os.path.dirname(os.path.realpath(__file__))
 FILES = ['sample.txt', 'input.txt']
-PAUSE = True
+PAUSE = False
 SOLUTION = 1
 
 def parse(my_input: list[str]) -> Grid:
@@ -41,19 +41,19 @@ def solution2(my_input: list[str]) -> int:
     global SOLUTION
     SOLUTION = 2
     grid = parse(my_input)
+    cells = grid.cells.values()
     total = 0
     while True:
-        cells: list[GridCell] = []
-        for cell in filter(lambda c: c.value == '@', grid.cells.values()):
+        removed = 0
+        for cell in filter(lambda c: c.value == '@', cells):
             neighbors = cell.neighbors(True)
             rolls = [c for c in neighbors if grid.in_bounds(c) and grid[c].value == '@']
             if len(rolls) < 4:
-                cells.append(cell)
-        if len(cells) == 0:
+                removed += 1
+                cell.value = '.'
+        if not removed:
             break
-        total += len(cells)
-        for cell in cells:
-            cell.value = '.'
+        total += removed
 
     return total
 
