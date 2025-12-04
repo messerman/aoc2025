@@ -32,6 +32,7 @@ def solution2(my_input: list[str]) -> int:
 
 result: int
 def main():
+    text = None
     for part in PARTS:
         print(f"---- Part {part} ----")
         for file in FILES:
