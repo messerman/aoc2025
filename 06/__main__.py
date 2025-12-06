@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import cProfile
+import math
 import os
 
 from tools.logger import DebugLogger as logger
@@ -12,15 +13,41 @@ PARTS = [2] if TIMING else [1, 2]
 FILES = ['input.txt'] if TIMING else ['sample.txt', 'input.txt']
 PAUSE = not TIMING
 
-def parse(my_input: list[str]) -> list[str]:
-    result: list[str] = [] # TODO - more accurate type, also for return type, above
+class SquidMath:
+    def __init__(self, operation: str, operands: list[int]):
+        assert operation in ['*', '+']
+        self.op_code = operation
+        self.operation = sum if operation == '+' else math.prod
+        self.operands = operands
+
+    def __str__(self) -> str:
+        return self.op_code.join(map(str, self.operands))
+
+    def __repr__(self) -> str:
+        return str(self)
+
+    def calculate(self) -> int:
+        return self.operation(self.operands)
+
+def parse(my_input: list[str]) -> list[SquidMath]:
+    result: list[SquidMath] = []
+    my_input = list(filter(lambda line: line, my_input))
+    columns: list[list[str]] = [[] for _ in range(len(my_input[0].split()))]
     for line in my_input:
         logger.trace(line)
+        if not line:
+            continue
         try:
-            result.append(line) # TODO - processing
+            for column,val in enumerate(line.split()):
+                columns[column].append(val)
+
         except BaseException as e:
             logger.error(line)
             raise e
+    logger.debug(columns)
+    for column in columns:
+        result.append(SquidMath(column[-1], list(map(int, column[:-1]))))
+        logger.debug(result[-1])
     logger.trace(result)
     return result
 
@@ -28,7 +55,8 @@ def solution1(my_input: list[str]) -> int:
     global SOLUTION
     SOLUTION = 1
     data = parse(my_input)
-    return -1 # TODO
+    logger.debug(data)
+    return sum(map(lambda x: x.calculate(), data))
 
 def solution2(my_input: list[str]) -> int:
     global SOLUTION
