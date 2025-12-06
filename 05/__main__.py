@@ -55,8 +55,6 @@ def solution2(my_input: list[str]) -> int:
     global SOLUTION
     SOLUTION = 2
     ranges = parse(my_input)[0]
-    for r in ranges.ranges:
-        logger.debug(r)
     ## 378933199096739 -- too high
     ## 415797806089628 -- without duplicate checking
     ## 343715508272336 -- lower, after double-checking the endpoints, still too high!!!
@@ -64,20 +62,6 @@ def solution2(my_input: list[str]) -> int:
     ## 365695132468020 -- nope, still too big - still have overlaps for some reason
     ## 332067203034711 -- woohoo!
 
-    print('-----')
-    overlaps = ranges.find_overlaps()
-    print(overlaps)
-    for r1,r2 in overlaps:
-        print(r1.start, '..', r1.stop, ' - ', r2.start, r2.stop)
-        print(r1.start in r2)
-        print(r2.start in r1)
-        print(r1.stop-1 in r2)
-        print(r2.stop-1 in r1)
-        
-    print('-----')
-
-
-    logger.info('how many?', ranges.count(1151221132517))
     return len(ranges)
 
 result: int
