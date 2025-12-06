@@ -20,6 +20,14 @@ class SquidMath:
         self.operation = sum if operation == '+' else math.prod
         self.operands = operands
 
+    @classmethod
+    def create(cls, operation: str, columns: list[str]) -> 'SquidMath':
+        operands: list[int] = []
+        for column in reversed(columns):
+            logger.debug(column)
+            operands.append(int(column))
+            logger.debug(operands[-1])
+        return cls(operation, operands)
     def __str__(self) -> str:
         return self.op_code.join(map(str, self.operands))
 
@@ -32,22 +40,47 @@ class SquidMath:
 def parse(my_input: list[str]) -> list[SquidMath]:
     result: list[SquidMath] = []
     my_input = list(filter(lambda line: line, my_input))
-    columns: list[list[str]] = [[] for _ in range(len(my_input[0].split()))]
+    if SOLUTION == 1:
+        columns: list[list[str]] = [[] for _ in range(len(my_input[0].split()))]
+    else:
+        columns: list[list[str]] = [[] for _ in list(my_input[0])]
     for line in my_input:
         logger.trace(line)
         if not line:
             continue
         try:
-            for column,val in enumerate(line.split()):
+            chars = line.split() if SOLUTION == 1 else list(line)
+            chars += ' ' * (len(columns) - len(chars))
+            column = 0
+            for column,val in enumerate(chars):
                 columns[column].append(val)
 
         except BaseException as e:
             logger.error(line)
             raise e
     logger.debug(columns)
-    for column in columns:
-        result.append(SquidMath(column[-1], list(map(int, column[:-1]))))
-        logger.debug(result[-1])
+
+    if SOLUTION==1:
+        for column in columns:
+            result.append(SquidMath(column[-1], list(map(int, column[:-1]))))
+            logger.trace(result[-1])
+    else:
+       operation = ''
+       nums: list[int] = []
+       for column in columns:
+           if len(list(filter(lambda c: c != ' ', column))) == 0:
+               result.append(SquidMath(operation, nums))
+               logger.trace(result[-1])
+               nums = []
+               operation = ''
+               continue
+
+           operation = operation if column[-1] == ' ' else column[-1]
+           num = int(''.join(column[:-1]))
+           nums.append(num)
+       result.append(SquidMath(operation, nums))
+       logger.trace(result[-1])
+    
     logger.trace(result)
     return result
 
@@ -62,7 +95,8 @@ def solution2(my_input: list[str]) -> int:
     global SOLUTION
     SOLUTION = 2
     data = parse(my_input)
-    return -1 # TODO
+    logger.debug(data)
+    return sum(map(lambda x: x.calculate(), data))
 
 result: int
 def main():
