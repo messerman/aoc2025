@@ -2,20 +2,26 @@
 import cProfile
 import os
 
-PARTS = [1, 2]
+from tools.logger import DebugLogger as logger
+
 PATH = os.path.dirname(os.path.realpath(__file__))
-FILES = ['sample.txt', 'input.txt']
-PAUSE = True
 SOLUTION = 1
+
+TIMING = True
+PARTS = [2] if TIMING else [1, 2]
+FILES = ['input.txt'] if TIMING else ['sample.txt', 'input.txt']
+PAUSE = not TIMING
 
 def parse(my_input: list[str]) -> list[str]:
     result: list[str] = [] # TODO - more accurate type, also for return type, above
     for line in my_input:
+        logger.trace(line)
         try:
             result.append(line) # TODO - processing
         except BaseException as e:
-            print(line)
+            logger.debug(line)
             raise e
+    logger.trace(result)
     return result
 
 def solution1(my_input: list[str]) -> int:
@@ -34,14 +40,14 @@ result: int
 def main():
     text = None
     for part in PARTS:
-        print(f"---- Part {part} ----")
+        logger.debug(f"---- Part {part} ----")
         for file in FILES:
             filename = file.split('.', maxsplit=1)[0]
-            print(f'-- {file} --')
+            logger.debug(f'-- {file} --')
             with open('/'.join([PATH, file]), 'r', encoding='utf-8') as f:
                 lines = f.read().split('\n')
                 cProfile.run(f'result = solution{part}({lines})', f'{part}-{filename}.pstats')
-                print(result)
+                logger.debug(result)
             if PAUSE:
                 text = input('continue? ')
                 if text:

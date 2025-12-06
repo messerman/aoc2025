@@ -5,11 +5,14 @@ import os
 from tools.disjoint_range import DisjointRange
 from tools.logger import DebugLogger as logger
 
-PARTS = [1, 2]
+
 PATH = os.path.dirname(os.path.realpath(__file__))
-FILES = ['sample.txt', 'input.txt']
-PAUSE = True
 SOLUTION = 1
+
+TIMING = False
+PARTS = [2] if TIMING else [1, 2]
+FILES = ['input.txt'] if TIMING else ['sample.txt', 'input.txt']
+PAUSE = not TIMING
 
 def parse(my_input: list[str]) -> tuple['DisjointRange', list[int]]:
     ranges = DisjointRange()
