@@ -1,4 +1,5 @@
 import itertools
+from typing import Type
 
 from .position import Position
 
@@ -6,6 +7,7 @@ class GridCell(Position):
     def __init__(self, x: int, y: int, value: str):
         super().__init__(x, y)
         self.value = value
+        self.counter = 0
 
     def __repr__(self):
         return f'({self.x},{self.y}):{self.value}'
@@ -13,14 +15,19 @@ class GridCell(Position):
     def __str__(self):
         return self.value
 
+    def pos(self):
+        return self.to_tuple()
+
 class Grid:
-    def __init__(self, width: int, height: int, default='.'):
+    def __init__(self, width: int, height: int, default='.', cell_type: Type[GridCell] = GridCell):
         self.cells: dict[tuple[int, int], GridCell] = {}
         self.width = width
         self.height = height
+        self.default = default
+        self.cell_type = cell_type
 
     @classmethod
-    def from_lists(cls, gridcells=list[list[GridCell]], width=-1, height=-1, default='.') -> 'Grid':
+    def from_lists(cls, gridcells:list[list[GridCell]], width=-1, height=-1, default='.') -> 'Grid':
         if width == -1:
             width = max(map(lambda cell: cell.x, itertools.chain.from_iterable(gridcells)))
         if height == -1:
@@ -42,6 +49,9 @@ class Grid:
             output.append(row)
         return'\n'.join(output)
 
+    def __hash__(self) -> int:
+        return hash(str(self))
+
     def at(self, pos: tuple[int, int]) -> GridCell:
         return self.cells[pos]
     
@@ -51,7 +61,7 @@ class Grid:
     def set_cell(self, x: int, y: int, value: str) -> bool:
         if not self.in_bounds((x, y)):
             return False
-        self.cells[(x, y)] = GridCell(x, y, value)
+        self.cells[(x, y)] = self.cell_type(x, y, value)
         return True
 
     def find(self, value: str) -> list[GridCell]:
@@ -111,7 +121,7 @@ class Grid:
         for direction in directions:
             res = []
             next_cell = cell
-            for i in range(length):
+            for _ in range(length):
                 res.append(next_cell.value)
                 try:
                     next_cell = self.at(direction(next_cell))

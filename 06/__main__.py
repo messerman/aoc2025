@@ -20,14 +20,6 @@ class SquidMath:
         self.operation = sum if operation == '+' else math.prod
         self.operands = operands
 
-    @classmethod
-    def create(cls, operation: str, columns: list[str]) -> 'SquidMath':
-        operands: list[int] = []
-        for column in reversed(columns):
-            logger.debug(column)
-            operands.append(int(column))
-            logger.debug(operands[-1])
-        return cls(operation, operands)
     def __str__(self) -> str:
         return self.op_code.join(map(str, self.operands))
 

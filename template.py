@@ -45,7 +45,7 @@ def main():
             filename = file.split('.', maxsplit=1)[0]
             logger.info(f'-- {file} --')
             with open('/'.join([PATH, file]), 'r', encoding='utf-8') as f:
-                lines = f.read().split('\n')
+                lines = f.read().strip().split('\n')
                 cProfile.run(f'result = solution{part}({lines})', f'{part}-{filename}.pstats')
                 logger.info(result)
             if PAUSE:
