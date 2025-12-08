@@ -33,14 +33,12 @@ def solution1(my_input: list[str], realInput=False) -> int:
     global SOLUTION
     SOLUTION = 1
     data = parse(my_input)
-    logger.debug('\n'.join(map(str, data)))
-    logger.debug('---' * 10)
 
     distances = {}
     for idx,node in enumerate(data[:-1]):
         for other in data[idx + 1:]:
             d = node.distance_to(other)
-            distances[d] = tuple(sorted([node, other]))
+            distances[d] = [node, other]
 
     num_to_count = 1000 if realInput else 10
     graph = Graph3D(data)
@@ -55,7 +53,25 @@ def solution2(my_input: list[str], realInput=False) -> int:
     global SOLUTION
     SOLUTION = 2
     data = parse(my_input)
-    return -1 # TODO
+
+    distances = {}
+    for idx,node in enumerate(data[:-1]):
+        for other in data[idx + 1:]:
+            d = node.distance_to(other)
+            distances[d] = [node, other]
+
+    graph = Graph3D(data)
+    result = -1
+    for distance in sorted(distances):
+        logger.debug(distance, len(graph.networks))
+        a,b = distances[distance]
+        graph.connect(a,b)
+        if len(graph.networks) == 1:
+            result = a.x * b.x
+            break
+
+
+    return result
 
 result: int
 def main():

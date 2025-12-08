@@ -31,23 +31,15 @@ class Graph3D:
             return
 
         self.connections.append(connection)
-        #logger.debug(f'added {connection} to connections')
         my_network: set[Node3D] = set()
         networks_to_remove: list[set[Node3D]] = []
         for network in self.networks:
             if node1 in network or node2 in network:
-                #logger.debug(f'found {node1} or {node2} in {network}')
                 my_network = my_network.union(network)
                 networks_to_remove.append(network)
-            else:
-                pass
-                #logger.debug(f'did NOT find {node1} or {node2} in {network}')
 
         if not my_network:
-            #logger.debug(f'creating network from {node1}, {node2}')
             my_network = set([node1,node2])
         for network in networks_to_remove:
-            #logger.debug(f'removing {network} from self.networks')
             self.networks.remove(network)
-        #logger.debug(f'adding {my_network} to self.networks)')
         self.networks.append(my_network)
