@@ -15,7 +15,7 @@ class DebugLogger:
     def log(cls, level: DebugLevel, val, *args, **kwargs):
         if level.value >= DEBUG_LEVEL.value:
             printable_args = ' '.join([str(val)] + list(map(str,args)))
-            print(f'[{level.name}] {printable_args}', **kwargs)
+            print(printable_args, **kwargs)
 
     @classmethod
     def trace(cls, val, *args, **kwargs):

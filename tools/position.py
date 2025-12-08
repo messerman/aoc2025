@@ -90,7 +90,7 @@ class Position:
         self.move(self.ne())
 
     def go_sw(self):
-        self.move(self.sw)
+        self.move(self.sw())
 
     def go_se(self):
         self.move(self.se())
