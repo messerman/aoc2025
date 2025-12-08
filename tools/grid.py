@@ -8,6 +8,7 @@ class GridCell(Position):
         super().__init__(x, y)
         self.value = value
         self.counter = 0
+        self.path = ''
 
     def __repr__(self):
         return f'({self.x},{self.y}):{self.value}'
@@ -41,7 +42,7 @@ class Grid:
         return grid
 
     def __str__(self) -> str:
-        output: list[str] = []
+        output: list[str] = ['']
         for y in range(self.height):
             row = ''
             for x in range(self.width):
