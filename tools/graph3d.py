@@ -1,6 +1,5 @@
 from dataclasses import dataclass, field
 
-from .logger import DebugLogger as logger
 from .node3d import Node3D
 
 @dataclass(frozen=True, order=True)
@@ -16,12 +15,20 @@ class Connection:
         return isinstance(other, Connection) and ((self.node1 == other.node1 and self.node2 == other.node2) or self.node1 == other.node2 and self.node2 == other.node1)
 
 class Graph3D:
-    def __init__(self, nodes: list[Node3D] = [], connections: list[Connection] = []):
+    def __init__(self, nodes: list[Node3D] = list(), connections: list[Connection] = list()):
+        if not nodes:
+            nodes = []
+        if not connections:
+            connections = []
         self.nodes = nodes
         self.networks: list[set[Node3D]] = [set([node]) for node in self.nodes]
         self.connections: list[Connection] = []
         for connection in connections:
             self.connect(connection.node1, connection.node2)
+
+    def add_node(self, node: Node3D):
+        self.nodes.append(node)
+        self.networks.append(set([node]))
 
     def connect(self, node1: Node3D, node2: Node3D):
         assert node1 in self.nodes and node2 in self.nodes

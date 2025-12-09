@@ -10,7 +10,7 @@ from tools.node3d import Node3D
 PATH = os.path.dirname(os.path.realpath(__file__))
 SOLUTION = 1
 
-TIMING = False
+TIMING = True
 PARTS = [2] if TIMING else [1, 2]
 FILES = ['input.txt'] if TIMING else ['sample.txt', 'input.txt']
 PAUSE = not TIMING
@@ -63,7 +63,7 @@ def solution2(my_input: list[str], realInput=False) -> int:
     graph = Graph3D(data)
     result = -1
     for distance in sorted(distances):
-        logger.debug(distance, len(graph.networks))
+        #logger.debug(distance, len(graph.networks))
         a,b = distances[distance]
         graph.connect(a,b)
         if len(graph.networks) == 1:
