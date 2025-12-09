@@ -2,9 +2,9 @@
 import cProfile
 import os
 
-from tools.graph3d import Graph3D
+import tools.colors as colors
+from tools.grid import GridCell, Grid
 from tools.logger import DebugLogger as logger
-from tools.node3d import Node3D
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 SOLUTION = 1
@@ -14,31 +14,39 @@ PARTS = [2] if TIMING else [1, 2]
 FILES = ['input.txt'] if TIMING else ['sample.txt', 'input.txt']
 PAUSE = not TIMING
 
-def parse(my_input: list[str]) -> Graph3D:
-    result: Graph3D = Graph3D()
+RED = colors.highlight(colors.Color.RED, 'R')
+def parse(my_input: list[str]) -> Grid:
+    cells: list[tuple[int, int]] = []
+    width = 0
+    height = 0
     for line in my_input:
         logger.trace(line)
         try:
             x,y = map(int, line.split(','))
-            result.add_node(Node3D(x, y, 0))
+            cells.append((x,y))
+            width = max(width, x)
+            height = max(height, y)
         except BaseException as e:
             logger.error(line)
             raise e
+    result: Grid = Grid(width+1, height+1)
+    for cell in cells:
+        result.set_cell(cell[0], cell[1], RED)
     logger.trace(result)
     return result
 
-def rect_area(node1: Node3D, node2: Node3D) -> int:
-    assert node1.z == node2.z == 0
-    return (abs(node1.x - node2.x) + 1) * (abs(node1.y - node2.y) + 1)
+def rect_area(cell1: GridCell, cell2: GridCell) -> int:
+    return (abs(cell1.x - cell2.x) + 1) * (abs(cell1.y - cell2.y) + 1)
 
 def solution1(my_input: list[str]) -> int:
     global SOLUTION
     SOLUTION = 1
-    graph = parse(my_input)
+    grid = parse(my_input)
     max_area = 0
-    for idx, node1 in enumerate(graph.nodes[:-1]):
-        for node2 in graph.nodes[idx+1:]:
-            area = rect_area(node1, node2)
+    reds = grid.find(RED)
+    for idx, cell1 in enumerate(reds[:-1]):
+        for cell2 in reds[idx+1:]:
+            area = rect_area(cell1, cell2)
             max_area = max(area, max_area)
     # 7146910476 - too high!?
     # 4771508457 ✅

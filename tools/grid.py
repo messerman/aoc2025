@@ -54,6 +54,8 @@ class Grid:
         return hash(str(self))
 
     def at(self, pos: tuple[int, int]) -> GridCell:
+        if self.in_bounds(pos) and pos not in self.cells:
+            return GridCell(pos[0], pos[1], self.default)#self.set_cell(pos[0], pos[1], self.default)
         return self.cells[pos]
     
     def __getitem__(self, index: tuple[int, int]) -> GridCell:
