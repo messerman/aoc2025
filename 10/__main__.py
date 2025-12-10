@@ -53,26 +53,26 @@ class Machine:
 
     def goal_path(self) -> list[int]:
         to_visit: deque[list[int]] = deque([[self.goal]])
-        visited: deque[list[int]] = deque()
+        visited: deque[tuple[int,int]] = deque()
         while to_visit:
             # logger.debug(len(to_visit), to_visit)
             path = to_visit.popleft()
-            visited.append(path)
             #logger.debug(f'  === {path} ===')
             target_state = path[0]
             #logger.debug(' ' * len(path), self.get_state(target_state, self.num_lights))
             possibilities = self.states[target_state]
             for s,b in possibilities:
-                #logger.debug(' '*(len(path)+1), s, b)
+                if (s,b) in visited:
+                    logger.debug(f'({s},{b}) skipped')
+                    continue
+                visited.append((s,b))
                 new_path = [s] + path
                 if s == 0:
                     #logger.debug(b, self.get_state(s, self.num_lights))
                     return new_path
-                if True or new_path not in visited:
-                    #logger.debug(f'adding {new_path}')
-                    to_visit.append(new_path)
-                else:
-                    logger.debug(f'{new_path} skipped')
+                #logger.debug(f'adding {new_path}')
+                to_visit.append(new_path)
+                
         return []
 
 def parse(my_input: list[str]) -> list[Machine]:
@@ -111,11 +111,12 @@ def solution1(my_input: list[str]) -> int:
         machine.populate_states()
     counts = []
     for i,machine in enumerate(data):
-        logger.info(f'=== {repr(machine) } ===')
+        logger.debug(f'=== {repr(machine) } ===')
         logger.debug('paths to goal:', machine.states[machine.goal])
         path = machine.goal_path()
         logger.info(f'machine {i}/{len(data)-1}: {len(path)-1}: {path}')
         counts.append(len(path) - 1)
+    # 512 ✅
     return sum(counts)
 
 def solution2(my_input: list[str]) -> int:
