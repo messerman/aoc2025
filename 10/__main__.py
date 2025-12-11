@@ -25,6 +25,9 @@ class Machine:
         self.joltage_requirement = joltage_requirement
         self.state = state
         self.states: dict[int, set[tuple[int,int]]] = {}
+        self.jnum = sum([joltage_requirement[i] * 1000**(len(joltage_requirement)-i-1) for i in range(len(joltage_requirement))])
+        self.jbuttons = [sum([1000**b for b in button]) for button in buttons]
+        print(self.jnum)
 
     @classmethod
     def get_state(cls, state: int, num_lights: int) -> str:
@@ -55,11 +58,8 @@ class Machine:
         to_visit: deque[list[int]] = deque([[self.goal]])
         visited: deque[tuple[int,int]] = deque()
         while to_visit:
-            # logger.debug(len(to_visit), to_visit)
             path = to_visit.popleft()
-            #logger.debug(f'  === {path} ===')
             target_state = path[0]
-            #logger.debug(' ' * len(path), self.get_state(target_state, self.num_lights))
             possibilities = self.states[target_state]
             for s,b in possibilities:
                 if (s,b) in visited:
@@ -68,12 +68,82 @@ class Machine:
                 visited.append((s,b))
                 new_path = [s] + path
                 if s == 0:
-                    #logger.debug(b, self.get_state(s, self.num_lights))
                     return new_path
-                #logger.debug(f'adding {new_path}')
                 to_visit.append(new_path)
                 
         return []
+
+    def joltage_valid(self, joltage: tuple[int, ...]) -> bool:
+        for i in range(len(self.joltage_requirement)):
+            if joltage[i] < 0 or joltage[i] > self.joltage_requirement[i]:
+                return False
+        return True
+
+    '''
+    def joltage_path(self) -> list[int]:
+        initial_joltage_state = tuple(self.joltage_requirement)
+        to_visit: deque[tuple[tuple[int, ...], list[int]]] = deque()
+        to_visit.append((initial_joltage_state, []))
+        visited: dict[tuple[int, ...], bool] = {}
+        zero_joltage = tuple([0 for _ in self.joltage_requirement])
+        while len(to_visit) > 0:
+            logger.debug(len(to_visit))#, to_visit)
+            #logger.debug('.', end='', flush=True)
+            jstate,path = to_visit.popleft()
+            visited[jstate] = True
+            for idx in range(len(self.buttons)):
+                update = tuple(self.decrement_joltages(jstate, idx))
+                new_path = [idx] + path
+                if update == zero_joltage:
+                    return path
+                if not update in visited and self.joltage_valid(update):
+                    to_visit.append((update, new_path))
+                    logger.debug(f'adding {update}')
+                elif not self.joltage_valid(update):
+                    logger.debug(f'invalid: {update}')
+                else:
+                    logger.debug(f'already have: {update}')
+        return []
+
+    def joltage_stages(self):
+        zero_joltage = tuple([0 for _ in self.joltage_requirement])
+        to_visit: deque[tuple[tuple[int, ...], list[int]]] = deque()
+        to_visit.append((zero_joltage, []))
+        visited: dict[tuple[int, ...], list[list[int]]] = {}
+        while len(to_visit) > 0:
+            logger.debug(len(to_visit))#, to_visit)
+            jstate,path = to_visit.popleft()
+            if not jstate in visited:
+                visited[jstate] = []
+            visited[jstate].append(path)
+            for idx in range(len(self.buttons)):
+                update = tuple(self.increment_joltages(jstate, idx))
+                new_path = path + [idx]
+                if not self.joltage_valid(update):
+                    #logger.debug(f'invalid: {update}')
+                    pass
+                elif update in visited:
+                    #logger.debug(f'already have {update}')
+                    pass
+                else:
+                    #logger.debug(f'adding {update}')
+                    to_visit.append((update, new_path))
+        print(visited)
+    '''
+    def joltage_stages(self):
+        jstages = {}
+        for num in range(1000):#self.jnum): # way too big
+            print('.', end='', flush=True)
+            for j,button in enumerate(self.jbuttons):
+                new_j = num + button
+                if new_j not in jstages:
+                    jstages[new_j] = []
+                jstages[new_j].append((num, j))
+            if self.jnum in jstages:
+                break
+        print(jstages[self.jnum])
+
+
 
 def parse(my_input: list[str]) -> list[Machine]:
     result: list[Machine] = []
@@ -105,8 +175,6 @@ def solution1(my_input: list[str]) -> int:
     SOLUTION = 1
     data = parse(my_input)
     logger.trace(data)
-    #logger.debug('\n'.join(map(str, data)))
-    #logger.info(max([x.num_lights for x in data]))
     for machine in data:
         machine.populate_states()
     counts = []
@@ -123,7 +191,24 @@ def solution2(my_input: list[str]) -> int:
     global SOLUTION
     SOLUTION = 2
     data = parse(my_input)
-    return -1 # TODO
+    logger.trace(data)
+    for machine in data:
+        machine.populate_states()
+    data = parse(my_input)
+    counts = []
+    for i,machine in enumerate(data):
+        logger.debug(f'=== Machine({i}/{len(data)-1}) -- {repr(machine)} ===')
+        machine.joltage_stages()
+        #logger.debug('paths to goal:', machine.states[machine.goal])
+        '''
+        path = machine.joltage_path()
+        logger.info(f'machine {i}/{len(data)-1}: {len(path)-1}: {path}')
+        counts.append(len(path) - 1)
+        '''
+
+        break
+
+    return sum(counts)
 
 result: int
 def main():
