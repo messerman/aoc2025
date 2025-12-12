@@ -36,35 +36,42 @@ class ServerRack:
                 paths.append(p)
         return paths
 
-    def populate_paths(self, key: str = 'out', terminators: set[str] = set(('you', 'svr'))):
-        # populate itself
-        self.paths[(key,key)] = {(key,)}
-        #self.paths[(key,key)].add((key,))
-        print(f'added: {key}')
+    def count_paths_with_required(self, start: str, goal: str, required: set[str]) -> int:
+        ########
+        # NOTE # this function was generated using Claude Code, to replace my reverse BFS algo that wasn't efficient enough
+        ########
+        """
+        Count paths from start to goal that pass through ALL nodes in required set.
+        Uses DP with state: (current_node, frozenset of required nodes visited)
+        """
+        # State: (node, visited_required_nodes) -> count of paths
+        from functools import lru_cache
 
-        to_visit: deque[str] = deque((key,))
-        visited: set[str] = set()
-        while to_visit:
-            print('.', end='', flush=True)
-            server = to_visit.popleft()
-            if server in visited:
-                print(f'skipping {server}')
-                continue
-            if server in terminators:
-                visited.add(server)
-                continue
-            for s in filter(lambda s: s not in visited, self.input_map[server]):
-                print(f'server: {server}, s: {s}, to_visit: {len(to_visit)}')
-                # for each server we haven't already visited
-                to_visit.append(s)
-                print(f'to_visit += {s}')
-                for path in self.paths[(server, key)]:
-                    #print('-', end='', flush=True)
-                    # add each of its paths
-                    new_path = ((s,) + path)
-                    self.paths[(s, key)].add(new_path)
-            visited.add(server)
-            to_visit = deque(filter(lambda s: s not in visited, to_visit))
+        required_frozen = frozenset(required)
+
+        @lru_cache(maxsize=None)
+        def count(node: str, visited_required: frozenset) -> int:
+            # Update visited_required if current node is in required set
+            if node in required_frozen:
+                visited_required = visited_required | frozenset([node])
+
+            # Base case: reached goal
+            if node == goal:
+                # Only count if we've visited all required nodes
+                return 1 if visited_required == required_frozen else 0
+
+            # No outgoing edges
+            if node not in self.output_map or not self.output_map[node]:
+                return 0
+
+            # Recursive case: sum paths through all neighbors
+            total = 0
+            for neighbor in self.output_map[node]:
+                total += count(neighbor, visited_required)
+
+            return total
+
+        return count(start, frozenset())
 
 def parse(my_input: list[str]) -> ServerRack:
     result: dict[str, deque[str]] = {}
@@ -96,14 +103,14 @@ def solution2(my_input: list[str], is_sample = False) -> int:
     if is_sample:
         my_input = open('/'.join([PATH, 'sample2.txt']), 'r', encoding='utf-8').read().strip().split('\n')
     data = parse(my_input)
-    data.populate_paths('out')
-    paths = data.paths[('svr', 'out')]
-    print('\n'.join(map(str, paths)))
+
+    # Count paths from 'svr' to 'out' that include both 'dac' and 'fft'
     required = set(['dac', 'fft'])
-    valid_paths = list(filter(lambda path: set(path).intersection(required) == required, paths))
-    print('-'*20)
-    print('\n'.join(map(str, valid_paths)))
-    return len(valid_paths)
+    count = data.count_paths_with_required('svr', 'out', required)
+
+    logger.info(f'Paths from svr to out containing both dac and fft: {count}')
+    # 517315308154944 ✅ *(had Claude help)
+    return count
 
 result: int
 def main():
